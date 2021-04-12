@@ -2,7 +2,7 @@
 /shelf/
 /workspace.xml
 # Datasource local storage ignored files
-/../../../../../../:\Users\biaav\PycharmProjects\arvores-aleatorias\.idea/dataSources/
+/../../../../../../../:\Users\biaav\PycharmProjects\arvores-aleatorias\random-tree-generator\.idea/dataSources/
 /dataSources.local.xml
 # Editor-based HTTP Client requests
 /httpRequests/
