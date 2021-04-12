@@ -121,10 +121,9 @@ def Diameter(tree: Grafo) -> int:
     return b.d
 
 
-def main():
-    inicio = timeit.default_timer()
-
+def TEST_RandomTreeRandomWalk():
     for i in range(1000):
+        print('Suit - RandomTreeRandomWalk: ', i)
         graph250: Grafo = RandomTreeRandomWalk(250)
         graph500: Grafo = RandomTreeRandomWalk(500)
         graph750: Grafo = RandomTreeRandomWalk(750)
@@ -141,6 +140,12 @@ def main():
         assert graph1500.isTree()
         assert graph1750.isTree()
         assert graph2000.isTree()
+
+
+def main():
+    inicio = timeit.default_timer()
+
+    TEST_RandomTreeRandomWalk()
 
     fim = timeit.default_timer()
 
