@@ -60,6 +60,8 @@ class Grafo:
                     Q.append(v)
             u.cor = "preto"
 
+        return u
+
     # Verifica se é uma arvore
     def isTree(self):
         # ve se arestas = vertices - 1
@@ -86,7 +88,7 @@ class Grafo:
 
 # Retorna o ultimo vertice de um grafo
 def GetLastVertex(graph: Grafo) -> Vertice:
-    v: Vertice = graph.vertices[len(graph.vertices)]
+    v: Vertice = graph.vertices[len(graph.vertices) - 1]
     return v
 
 
@@ -110,20 +112,40 @@ def RandomTreeRandomWalk(n: int) -> Grafo:
 
 
 # Calculo do diameter
-def Diameter(tree: Grafo) -> int:
+def Diameter(tree: Grafo) -> float:
     n: int = tree.pickRandomVertexId()  # pega um numero aleatorio no range da quantidade de vertices
     s: Vertice = tree.vertices[n]
 
-    tree.BFS(s)
-    a: Vertice = GetLastVertex(tree)
-    tree.BFS(a)
-    b: Vertice = GetLastVertex(tree)
+    a: Vertice = tree.BFS(s)
+    # a: Vertice = GetLastVertex(tree)
+    b: Vertice = tree.BFS(a)
+   # b: Vertice = GetLastVertex(tree)
     return b.d
+
+def GenerateTXT(fileName, list):
+    try:
+        file = open(fileName, 'r+')
+    except FileNotFoundError:
+        file = open(fileName, 'w+')
+
+    for sublist in list:
+        file.write(str(sublist[0]) + " " + str(sublist[1]) + "\n")
+
+    file.close()
+
+def TEST_isTree():
+    # caso 1 - não é arvore, pois arestas != vertices - 1
+    graph1: Grafo = Grafo(5)
+    graph1.addEdge(0, 1)
+    graph1.addEdge(2, 1)
+
+    # caso 2 - não é arvore, pois não é conexo
+
+    # caso 3 - é arvore
 
 
 def TEST_RandomTreeRandomWalk():
-    for i in range(1000):
-        print('Suit - RandomTreeRandomWalk: ', i)
+    for i in range(500):
         graph250: Grafo = RandomTreeRandomWalk(250)
         graph500: Grafo = RandomTreeRandomWalk(500)
         graph750: Grafo = RandomTreeRandomWalk(750)
@@ -141,11 +163,25 @@ def TEST_RandomTreeRandomWalk():
         assert graph1750.isTree()
         assert graph2000.isTree()
 
+def RunAllTests():
+    TEST_RandomTreeRandomWalk()
+
 
 def main():
     inicio = timeit.default_timer()
 
-    TEST_RandomTreeRandomWalk()
+    entries = [250, 500, 750, 1000, 1250, 1500, 1750, 2000]
+    random_walk_result = []
+
+    for entry in entries:
+        tree: Grafo = RandomTreeRandomWalk(entry)
+        diameter = Diameter(tree)
+        random_walk_result.append([entry, diameter])
+
+    print(random_walk_result)
+    GenerateTXT("randomwalk.txt", random_walk_result)
+
+    # RunAllTests()
 
     fim = timeit.default_timer()
 
