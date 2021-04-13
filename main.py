@@ -42,7 +42,7 @@ class Grafo:
             v.cor = "branco"
             v.f = -1
 
-    # BFS
+    # BFS que retorna o ultimo vertice dequeued
     def BFS(self, s: Vertice):
         self.initializeAllVertex()
         s.d = 0
@@ -86,12 +86,6 @@ class Grafo:
         return False
 
 
-# Retorna o ultimo vertice de um grafo
-def GetLastVertex(graph: Grafo) -> Vertice:
-    v: Vertice = graph.vertices[len(graph.vertices) - 1]
-    return v
-
-
 # Geração de arvore aleatoria
 def RandomTreeRandomWalk(n: int) -> Grafo:
     graph: Grafo = Grafo(n)
@@ -117,10 +111,9 @@ def Diameter(tree: Grafo) -> float:
     s: Vertice = tree.vertices[n]
 
     a: Vertice = tree.BFS(s)
-    # a: Vertice = GetLastVertex(tree)
     b: Vertice = tree.BFS(a)
-   # b: Vertice = GetLastVertex(tree)
     return b.d
+
 
 def GenerateTXT(fileName, list):
     try:
@@ -133,15 +126,49 @@ def GenerateTXT(fileName, list):
 
     file.close()
 
+
+def TEST_Diameter():
+    graph1: Grafo = Grafo(4)
+    graph1.addEdge(0, 1)
+    graph1.addEdge(2, 1)
+    graph1.addEdge(3, 1)
+    assert Diameter(graph1) == 2
+
+    graph2: Grafo = Grafo(9)
+    graph2.addEdge(0, 1)
+    graph2.addEdge(0, 2)
+    graph2.addEdge(2, 3)
+    graph2.addEdge(2, 8)
+    graph2.addEdge(3, 6)
+    graph2.addEdge(3, 4)
+    graph2.addEdge(4, 5)
+    graph2.addEdge(5, 7)
+    assert Diameter(graph2) == 6
+
+
 def TEST_isTree():
     # caso 1 - não é arvore, pois arestas != vertices - 1
     graph1: Grafo = Grafo(5)
     graph1.addEdge(0, 1)
     graph1.addEdge(2, 1)
+    graph1.addEdge(3, 1)
+    assert graph1.isTree() == False
 
     # caso 2 - não é arvore, pois não é conexo
+    graph2: Grafo = Grafo(5)
+    graph2.addEdge(0, 1)
+    graph2.addEdge(0, 2)
+    graph2.addEdge(1, 3)
+    graph2.addEdge(2, 1)
+    assert graph2.isTree() == False
 
     # caso 3 - é arvore
+    graph3: Grafo = Grafo(5)
+    graph3.addEdge(0, 1)
+    graph3.addEdge(0, 2)
+    graph3.addEdge(1, 3)
+    graph3.addEdge(2, 4)
+    assert graph3.isTree() == True
 
 
 def TEST_RandomTreeRandomWalk():
@@ -163,25 +190,34 @@ def TEST_RandomTreeRandomWalk():
         assert graph1750.isTree()
         assert graph2000.isTree()
 
+
 def RunAllTests():
+    TEST_Diameter()
+    TEST_isTree()
     TEST_RandomTreeRandomWalk()
+
+
+def RunRandomWalk():
+    random_walk_result = []
+    entries = [250, 500, 750, 1000, 1250, 1500, 1750, 2000]
+    for entry in entries:
+        diameterSum = 0
+        n = 100
+        for i in range(n):
+            tree = RandomTreeRandomWalk(entry)
+            diameter = Diameter(tree)
+            diameterSum = diameter + diameterSum
+        diameterAvg = diameterSum / n
+        random_walk_result.append([entry, diameterAvg])
+
+    GenerateTXT("randomwalk.txt", random_walk_result)
 
 
 def main():
     inicio = timeit.default_timer()
 
-    entries = [250, 500, 750, 1000, 1250, 1500, 1750, 2000]
-    random_walk_result = []
-
-    for entry in entries:
-        tree: Grafo = RandomTreeRandomWalk(entry)
-        diameter = Diameter(tree)
-        random_walk_result.append([entry, diameter])
-
-    print(random_walk_result)
-    GenerateTXT("randomwalk.txt", random_walk_result)
-
-    # RunAllTests()
+    RunRandomWalk()
+    RunAllTests()
 
     fim = timeit.default_timer()
 
