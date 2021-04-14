@@ -20,6 +20,7 @@ def main():
         print("Algoritmo inválido:", alg)
     lines = sys.stdin.readlines()
     data = np.array([list(map(float, line.split())) for line in lines])
+    print(data)
     n = data[:, 0]
     data = data[:, 1]
     a, fitted = fit(fun, n, data)

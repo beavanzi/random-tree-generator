@@ -1,0 +1,6 @@
+README.md
+main.py
+plot.py
+randomwalk.txt
+teste.txt
+venv/

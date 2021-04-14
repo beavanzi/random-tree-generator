@@ -148,11 +148,12 @@ def TEST_Diameter():
 
 def TEST_isTree():
     # caso 1 - não é arvore, pois arestas != vertices - 1
+
     graph1: Grafo = Grafo(5)
     graph1.addEdge(0, 1)
     graph1.addEdge(2, 1)
     graph1.addEdge(3, 1)
-    assert graph1.isTree() == False
+    assert not graph1.isTree()
 
     # caso 2 - não é arvore, pois não é conexo
     graph2: Grafo = Grafo(5)
@@ -160,7 +161,7 @@ def TEST_isTree():
     graph2.addEdge(0, 2)
     graph2.addEdge(1, 3)
     graph2.addEdge(2, 1)
-    assert graph2.isTree() == False
+    assert not graph2.isTree()
 
     # caso 3 - é arvore
     graph3: Grafo = Grafo(5)
@@ -168,33 +169,12 @@ def TEST_isTree():
     graph3.addEdge(0, 2)
     graph3.addEdge(1, 3)
     graph3.addEdge(2, 4)
-    assert graph3.isTree() == True
-
-
-def TEST_RandomTreeRandomWalk():
-    for i in range(500):
-        graph250: Grafo = RandomTreeRandomWalk(250)
-        graph500: Grafo = RandomTreeRandomWalk(500)
-        graph750: Grafo = RandomTreeRandomWalk(750)
-        graph1000: Grafo = RandomTreeRandomWalk(1000)
-        graph1250: Grafo = RandomTreeRandomWalk(1250)
-        graph1500: Grafo = RandomTreeRandomWalk(1500)
-        graph1750: Grafo = RandomTreeRandomWalk(1750)
-        graph2000: Grafo = RandomTreeRandomWalk(2000)
-        assert graph250.isTree()
-        assert graph500.isTree()
-        assert graph750.isTree()
-        assert graph1000.isTree()
-        assert graph1250.isTree()
-        assert graph1500.isTree()
-        assert graph1750.isTree()
-        assert graph2000.isTree()
+    assert graph3.isTree()
 
 
 def RunAllTests():
     TEST_Diameter()
     TEST_isTree()
-    TEST_RandomTreeRandomWalk()
 
 
 def RunRandomWalk():
@@ -202,11 +182,13 @@ def RunRandomWalk():
     entries = [250, 500, 750, 1000, 1250, 1500, 1750, 2000]
     for entry in entries:
         diameterSum = 0
-        n = 100
+        n = 500
         for i in range(n):
             tree = RandomTreeRandomWalk(entry)
+            assert tree.isTree()
             diameter = Diameter(tree)
             diameterSum = diameter + diameterSum
+
         diameterAvg = diameterSum / n
         random_walk_result.append([entry, diameterAvg])
 
