@@ -1,10 +1,38 @@
 from typing import List
 import timeit
 import random
+from copy import deepcopy
+from operator import itemgetter
 
 
 # Beatriz Avanzi Ecli       RA 108612
 # Sarah Anduca              RA 115506
+
+class DisjointSets:
+    parent = {}
+    rank = {}
+
+    def MakeSet(self, vertex):
+        self.parent[vertex] = vertex
+        self.rank[vertex] = 0
+
+    def FindSet(self, vertex):
+        if self.parent[vertex] == vertex:
+            return vertex
+        return self.FindSet(self.parent[vertex])
+
+    def Union(self, vertex_u, vertex_v):
+        vertex_u_root = self.FindSet(vertex_u)
+        vertex_v_root = self.FindSet(vertex_v)
+
+        if self.rank[vertex_u_root] > self.rank[vertex_v_root]:
+            self.parent[vertex_v_root] = vertex_u_root
+        elif self.rank[vertex_u_root] < self.rank[vertex_v_root]:
+            self.parent[vertex_u_root] = vertex_v_root
+        else:
+            self.parent[vertex_u_root] = vertex_v_root
+            self.rank[vertex_v_root] += 1
+
 
 class Vertice:
     def __init__(self, num: int) -> None:
@@ -17,17 +45,35 @@ class Vertice:
         self.adj: List[Vertice] = []
 
 
+class Edge:
+    weight: float
+    u: int
+    v: int
+
+    def __init__(self, u: int, v: int) -> None:
+        self.weight = 0
+        self.u = u
+        self.v = v
+
+
 class Grafo:
+    numberOfVertices: int
+    numberOfEdges: int
+    edgesWeight: List[float]
+
     def __init__(self, n: int) -> None:
         self.vertices = [Vertice(i) for i in range(n)]
+        self.edges = []
         self.numberOfVertices = n
         self.numberOfEdges = 0
         self.isConnected = True
+        self.edgesWeight: dict = {}
 
     def addEdge(self, u: int, v: int):
         self.vertices[u].adj.append(self.vertices[v])
         self.vertices[v].adj.append(self.vertices[u])
         self.numberOfEdges = self.numberOfEdges + 1
+        self.edges.append(Edge(u, v))
 
     # Pega o "id" de um vertice aleatorio do grafo
     def pickRandomVertexId(self) -> int:
@@ -86,6 +132,51 @@ class Grafo:
         return False
 
 
+def GenerateFullGraph(n: int) -> Grafo:
+    graph: Grafo = Grafo(n)
+    fullGraphNumberEdges = (n * (n - 1)) / 2
+    verticesAvailable = deepcopy(graph.vertices)
+    verticesAvailable.pop(0)
+    for vertexIndex in range(graph.numberOfVertices - 1):
+        for accessibleVertex in verticesAvailable:
+            graph.addEdge(vertexIndex, accessibleVertex.num)
+        assert len(graph.vertices[vertexIndex].adj) == n-1
+        verticesAvailable.pop(0)
+
+    assert graph.numberOfEdges == fullGraphNumberEdges
+    return graph
+
+
+# Geração de arvore aleatoria pelo algoritmo de Kruskal
+def RandomTreeKruskal(n: int) -> Grafo:
+    graph: Grafo = GenerateFullGraph(n)
+
+    for edge in graph.edges:
+        weight = random.random()
+        edge.weight = weight
+        graph.edgesWeight[weight] = edge
+    MST_Kruskal(graph)
+
+    # assert graph.isTree()
+    return graph
+
+
+def MST_Kruskal(graph: Grafo):
+    # tree: Grafo = Grafo(graph.numberOfVertices)
+    treeGroup = []
+    disjointSets = DisjointSets()
+    for vertex in graph.vertices:
+        disjointSets.MakeSet(vertex)
+    edgesSorted: dict = sorted(graph.edgesWeight.items(), key=itemgetter(0))
+    for (weight, edge) in edgesSorted:
+        if disjointSets.FindSet(edge.u) != disjointSets.FindSet(edge.v):
+            # tree.addEdge(u, v)
+            treeGroup.append(edge)
+            disjointSets.Union(edge.u, edge.v)
+
+    return treeGroup
+
+
 # Geração de arvore aleatoria
 def RandomTreeRandomWalk(n: int) -> Grafo:
     graph: Grafo = Grafo(n)
@@ -102,6 +193,8 @@ def RandomTreeRandomWalk(n: int) -> Grafo:
             graph.addEdge(u.num, v.num)
             v.visited = True
         u = v
+
+    assert graph.isTree()
     return graph
 
 
@@ -115,13 +208,13 @@ def Diameter(tree: Grafo) -> float:
     return b.d
 
 
-def GenerateTXT(fileName, list):
+def GenerateTXT(fileName: str, elements):
     try:
         file = open(fileName, 'r+')
     except FileNotFoundError:
         file = open(fileName, 'w+')
 
-    for sublist in list:
+    for sublist in elements:
         file.write(str(sublist[0]) + " " + str(sublist[1]) + "\n")
 
     file.close()
@@ -185,7 +278,6 @@ def RunRandomWalk():
         n = 500
         for i in range(n):
             tree = RandomTreeRandomWalk(entry)
-            assert tree.isTree()
             diameter = Diameter(tree)
             diameterSum = diameter + diameterSum
 
@@ -198,8 +290,9 @@ def RunRandomWalk():
 def main():
     inicio = timeit.default_timer()
 
-    RunRandomWalk()
-    RunAllTests()
+    # RunRandomWalk()
+    # RunAllTests()
+    RandomTreeKruskal(4)
 
     fim = timeit.default_timer()
 
